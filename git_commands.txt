@@ -1,0 +1,56 @@
+git config --list
+  106  git config --global user.email shreyshekhar4@gmail.com
+  107  git config --list
+  111  git status
+  112  git init
+  114  cat .git
+  115  cd .git
+  121  tree .git
+  122  git status
+  123  git add .
+  124  git status
+  125  git rm --cached first.log
+  126  git status
+  127  git add first.log
+  128  git status
+  129  git commit -m "my first commit"
+  130  git status
+  131  git log
+  133  git status
+  134  git history
+  138  git status
+  139  git commit -m "first commit"
+  140  git add .
+  141  git commit -m "first commit"
+  142  git log --oneline
+  143  git remote add origin https://github.com/shrey90/gitfirst.git
+  144  git remote
+  145  git remote -v
+  146  git push
+  147  git push -u origin main
+  148  git push -u origin main
+  149  git push -u origin main
+  150  git clone https://github.com/shrey90/Ansible.git
+  153  git status
+  154  git log --oneline
+  159  git commit - a -m "new commit updated"
+  160  git commit -a -m "new commit updated"
+  161  git status
+  162  git push
+  163  git log --oneline
+  164  git show c167130
+  165  git remote
+  166  git remote -v
+  167  vi /root/.gitconfig
+  170  cd .git
+  173  git log --oneline
+  184  ssh -T git@github.com
+  185  git push
+  186  cd .git
+  190  git push
+  197  git commit -a -m "new ssh key updated"
+  198  git push
+  199  git logs --oneline
+  200  git log --oneline
+  201  git show 05bd945
+  202  git remote -v

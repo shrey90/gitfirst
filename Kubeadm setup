@@ -1,0 +1,54 @@
+Kubeadm Cluster Setup (v1.33 / v1.32)
+1. Pre-requisites
+Use n, n-1, n-2 version of kubeadm, kubelet, kubectl (to avoid version mismatch).
+Port 6443 must be free (used by kube-apiserver).
+Disable swap (K8s won’t run with swap enabled):
+swapoff -a
+sudo vi /etc/fstab   # comment out swap line
+sudo mount -a
+2. Install Container Runtime (CRI-O / containerd / Docker-shim not recommended now)
+Example: CRI-O
+sudo apt install cri-o cri-o-runc -y
+systemctl enable --now crio
+systemctl status crio
+3. Enable Packet Forwarding
+cat <<EOF | sudo tee /etc/sysctl.d/99-kubernetes-cri.conf
+net.bridge.bridge-nf-call-iptables  = 1
+net.ipv4.ip_forward                 = 1
+net.bridge.bridge-nf-call-ip6tables = 1
+EOF
+sudo sysctl --system
+4. Install Kubernetes Packages
+sudo apt update
+sudo apt install -y kubeadm kubelet kubectl
+sudo apt-mark hold kubeadm kubelet kubectl
+5. Pull Control Plane Images
+sudo kubeadm config images pull
+sudo crictl images   # verify
+6. Initialize Control Plane (Master Node)
+sudo kubeadm init --apiserver-advertise-address=<CONTROL_PLANE_IP> \
+                  --pod-network-cidr=<CIDR>   # e.g. 192.168.0.0/16
+7. Configure kubectl for Admin User
+mkdir -p $HOME/.kube
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
+8. Install Pod Network Add-On
+(Choose one: Calico / Flannel / Cilium)
+Example (Calico):
+kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
+Networks in K8s:
+Management / Underlay Network → Node to node communication.
+Container Runtime Network → Local runtime network.
+Pod Network / Overlay Network → Cluster-wide pod IP allocation.
+9. Verify System Pods
+kubectl get pods -n kube-system
+# coredns, kube-proxy, calico/flannel pods, etc.
+10. Add Worker Nodes
+On worker node:
+sudo kubeadm join <CONTROL_PLANE_IP>:6443 --token <token> --discovery-token-ca-cert-hash sha256:<hash>
+If token lost:
+kubeadm token create --print-join-command
+11. Cluster Components
+Control plane runs as containers via CRI.
+Pods like kube-proxy, CNI plugin, CoreDNS run as DaemonSets / Deployments.
+Each new worker will get its own kube-proxy + CNI pod scheduled automatically.
